@@ -1,20 +1,22 @@
 package bitspittle.autostretch.cli
 
 import bitspittle.autostretch.data.routines.createMuscleWatching28MinuteRoutine
-import bitspittle.autostretch.model.runner.Routine
-import bitspittle.autostretch.model.runner.RoutineEvents
-import bitspittle.autostretch.model.runner.RoutineRunner
+import bitspittle.autostretch.model.routine.Routine
+import bitspittle.autostretch.model.routine.RoutineEvents
+import bitspittle.autostretch.model.routine.RoutineRunner
 import bitspittle.autostretch.model.stretch.MutableDuration
 import bitspittle.autostretch.model.stretch.Side
 import bitspittle.autostretch.model.stretch.Stretch
+import bitspittle.autostretch.model.user.MutableUserSettings
 
 fun main() {
     var finished = false
+    val settings = MutableUserSettings()
     val routineEvents = object : RoutineEvents {
         override fun starting(routine: Routine) {
             println("Let's stretch!!")
             println()
-            println("The following routine will take ${routine.totalTime().toReadableString()}")
+            println("The following routine will take ${routine.totalTime(settings).toReadableString()}")
         }
 
         private fun beep() {
@@ -65,7 +67,7 @@ fun main() {
     }
 
     val routine = createMuscleWatching28MinuteRoutine()
-    val runner = RoutineRunner(routine, routineEvents)
+    val runner = RoutineRunner(settings, routine, routineEvents)
 
     val elapsed = MutableDuration()
     var lastFrameStart = System.nanoTime()

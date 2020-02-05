@@ -1,12 +1,17 @@
-package bitspittle.autostretch.model.runner
+package bitspittle.autostretch.model.routine
 
 import bitspittle.autostretch.model.stretch.Duration
 import bitspittle.autostretch.model.stretch.MutableDuration
 import bitspittle.autostretch.model.stretch.Side
 import bitspittle.autostretch.model.stretch.Stretch
+import bitspittle.autostretch.model.user.UserSettings
 import bitspittle.autostretch.model.util.StateMachine
 
-class RoutineRunner(private val routine: Routine, private val routineEvents: RoutineEvents) {
+class RoutineRunner(
+    private val settings: UserSettings,
+    private val routine: Routine,
+    private val routineEvents: RoutineEvents
+) {
     private enum class State {
         INITIAL,
         IN_BETWEEN_STRETCHES,
@@ -38,22 +43,22 @@ class RoutineRunner(private val routine: Routine, private val routineEvents: Rou
         stateMachine.allowTransition(State.STRETCHING, State.FINISHED)
 
         stateMachine.onStateEntered(State.IN_BETWEEN_STRETCHES) {
-            timeUntilStretch.set(routine.timeBetweenStretches)
+            timeUntilStretch.set(settings.timeBetweenStretches)
             currStretchSide = when (currStretch.type) {
-                Stretch.Type.PER_SIDE -> routine.preferredInitialSide
+                Stretch.Type.PER_SIDE -> settings.preferredInitialSide
                 else -> null
             }
 
             routineEvents.getReadyForNext(currStretch, currStretchSide)
         }
         stateMachine.onStateEntered(State.SWITCHING_SIDES) {
-            timeUntilStretch.set(routine.timeToSwitchSides)
+            timeUntilStretch.set(settings.timeToSwitchSides)
             currStretchSide = currStretchSide!!.switch()
 
             routineEvents.switchSides(currStretch, currStretchSide!!)
         }
         stateMachine.onStateEntered(State.STRETCHING) {
-            timeUntilStretchFinished.set(routine.timePerStretch)
+            timeUntilStretchFinished.set(settings.timePerStretch)
             routineEvents.startStretching()
         }
         stateMachine.onStateEntered(State.FINISHED) {
@@ -80,9 +85,9 @@ class RoutineRunner(private val routine: Routine, private val routineEvents: Rou
                 }
             }
             State.STRETCHING -> {
-                reduceTimeUntiStretchFinished(duration)
+                reduceTimeUntilStretchFinished(duration)
                 if (timeUntilStretchFinished <= Duration.ZERO) {
-                    if (currStretch.type == Stretch.Type.PER_SIDE && currStretchSide == routine.preferredInitialSide) {
+                    if (currStretch.type == Stretch.Type.PER_SIDE && currStretchSide == settings.preferredInitialSide) {
                         stateMachine.enterState(State.SWITCHING_SIDES)
                     }
                     else {
@@ -106,7 +111,7 @@ class RoutineRunner(private val routine: Routine, private val routineEvents: Rou
         }
     }
 
-    private fun reduceTimeUntiStretchFinished(duration: Duration) {
+    private fun reduceTimeUntilStretchFinished(duration: Duration) {
         reduceDurationAndFireIfSecondsChanged(timeUntilStretchFinished, duration) { secs ->
             routineEvents.countdown(secs)
         }

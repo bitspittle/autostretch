@@ -1,7 +1,7 @@
 package bitspittle.autostretch.data.routines
 
 import bitspittle.autostretch.data.stretches.Legs
-import bitspittle.autostretch.model.runner.MutableRoutine
+import bitspittle.autostretch.model.routine.MutableRoutine
 
 // From https://www.youtube.com/watch?v=aFCEuADByyo
 fun createMuscleWatching28MinuteRoutine() = MutableRoutine().apply {

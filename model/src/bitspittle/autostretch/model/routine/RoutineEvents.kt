@@ -1,4 +1,4 @@
-package bitspittle.autostretch.model.runner
+package bitspittle.autostretch.model.routine
 
 import bitspittle.autostretch.model.stretch.Side
 import bitspittle.autostretch.model.stretch.Stretch

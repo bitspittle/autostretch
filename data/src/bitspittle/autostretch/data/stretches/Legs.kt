@@ -10,7 +10,7 @@ object Legs {
 
     val SINGLE_LEG_OPENER = Stretch(
         "Light (Side) Leg Opener",
-        "Bend your (!side) leg, foot against groin, and stretch out your (side) leg",
+        "Stretch out your (side) leg, and bend your (!side) leg so your foot rests against your groin.",
         Stretch.Type.PER_SIDE
     )
 }
